@@ -1,12 +1,13 @@
 
 # AWS FullStack Inventory Management System
-http://my-ebs-env.eba-pwmcdgmn.us-east-1.elasticbeanstalk.com/mainscreen   EBS HOSTED
 
+
+http://my-ebs-env.eba-pwmcdgmn.us-east-1.elasticbeanstalk.com/mainscreen   *NO LONGER HOSTED!*
 ## Overview
 
 This project demonstrates inventory management by filtering for engine parts and car products. It includes indexing as well as search functionality for either parts or products. CRUD is used in the project to create, update, and delete engine parts and car products. The theme of the project focuses on car products which will be car models in this case, with engine parts corresponding to each product.
 
-![image](https://github.com/user-attachments/assets/50b86a4a-6927-4f58-a51c-b5f9ce00231c)
+![Link To UML](https://github.com/user-attachments/assets/50b86a4a-6927-4f58-a51c-b5f9ce00231c)
 
 ## Features
 
@@ -17,29 +18,34 @@ This project demonstrates inventory management by filtering for engine parts and
 * **Downloadable CSV Report**. Export current inventory into a CSV file for audits or records.
 * **UI Part/Model Association**. Assign multiple parts to products with a clean visual interface.
 
+
 ## Technologies Used
 
-* **Backend**: SpringBoot
-* **Frontend**: React [FRONTEND REPO](https://github.com/KevinLlano/React-Frameworks2.0.git)
-* **Database**: H2 (Dev), PostgreSQL (Production)
+* **Backend**: Spring Boot
+* **Frontend**: React – [Frontend Repo](https://github.com/KevinLlano/React-Frameworks2.0.git)
+* **Database**: H2 (Development), PostgreSQL (Production)
 * **Hosting**: AWS EC2, AWS Elastic Beanstalk
-* **Version Control**: GitHub
-* **Libraries**:
+* **Version Control**: Git & GitHub
+* **Infrastructure as Code**: Terraform
 
-  * SpringBootStarterWeb
-  * SpringBootStarterDataJPA
-  * Thymeleaf
-  * SpringBootStarterValidation
-  * SpringBootDevTools
-  * H2 Database
-  * PostgreSQL
-  * SpringBootStarterTest
-  * JUnit
-  * Mockito
-  * Lombok
-  * Maven
+**Libraries & Tools**:
+- Terraform
+- Spring Boot Starter Web
+- Spring Boot Starter Data JPA
+- Thymeleaf
+- Spring Boot Starter Validation
+- Spring Boot DevTools
+- H2 Database
+- PostgreSQL
+- Spring Boot Starter Test
+- JUnit
+- Mockito
+- Lombok
+- Maven
+```
 
----
+
+
 
 ## UML Overview
 
@@ -49,9 +55,9 @@ The system models a **many-to-many** relationship between Products and Parts usi
 * **Parts** = either **InhousePart** (includes part ID) or **OutsourcedPart** (includes company name)
 * Uses **single-table inheritance** for part types
 
-![image](https://github.com/user-attachments/assets/4476e41f-1939-4bf9-870d-5809ed63b0c9)
-
+![UML DIAGRAPHM PIC](https://github.com/user-attachments/assets/7171c3c3-ad40-4faa-bef1-03ab7ff010c1)
 ---
+
 
 # Getting Started
 
@@ -172,8 +178,8 @@ assertEquals("mainscreen", result);
 ### Setup
 
 ```bash
-git clone https://gitlab.com/wgu-gitlab-environment/student-repos/kllano2/d424-software-engineering-capstone.git
-cd car-parts-inventory
+git clone [https://gitlab.com/wgu-gitlab-environment/student-repos/kllano2/d424-software-engineering-capstone.git](https://github.com/KevinLlano/AWS-Inventory-Management-System)
+cd aws-inventory-system
 ```
 
 * Create DB:
