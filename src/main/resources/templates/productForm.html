@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Part Form</title>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body style="font-family: Arial; margin: 0; display: flex; flex-direction: column; align-items: center;">
+
+<div style="text-align: center; width: 100%; max-width: 600px; margin-top: 20px;">
+    <a href="/" style="color: blue; text-decoration: underline; display: block; margin-bottom: 20px;">
+        &larr; Return to Main Screen
+    </a>
+
+    <h1>Product Detail</h1>
+    <form action="#" th:action="@{/showFormAddProduct}" th:object="${product}" method="POST">
+        <p><input type="hidden" th:field="*{id}"/></p>
+
+        <p><input type="text" th:field="*{name}" placeholder="Name" style="width: 100%; padding: 5px;" /></p>
+
+        <p><input type="text" th:field="*{price}" placeholder="Price" style="width: 100%; padding: 5px;" /></p>
+
+        <p><input type="text" th:field="*{inv}" placeholder="Inventory" style="width: 100%; padding: 5px;" /></p>
+
+        <div th:if="${#fields.hasAnyErrors()}">
+            <ul>
+                <li class="error" th:each="err : ${#fields.allErrors()}" th:text="${err}"></li>
+            </ul>
+        </div>
+
+        <p><input type="submit" value="Submit" style="padding: 6px 12px;" /></p>
+    </form>
+</div>
+
+<div style="width: 90%; max-width: 1000px; margin-top: 40px;">
+    <h2>Available Parts</h2>
+    <table class="table table-bordered table-striped" style="width: 100%;">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Inventory</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <form>
+            <tr th:each="tempPart : ${availparts}">
+                <td th:text="${tempPart.name}">1</td>
+                <td th:text="${tempPart.price}">1</td>
+                <td th:text="${tempPart.inv}">1</td>
+                <td><a th:href="@{/associatepart(partID=${tempPart.id})}" class="btn btn-primary btn-sm mb-3">Add</a></td>
+            </tr>
+        </form>
+    </table>
+
+    <h2>Associated Parts</h2>
+    <table class="table table-bordered table-striped" style="width: 100%;">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Inventory</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="tempPart : ${assparts}">
+            <td th:text="${tempPart.name}">1</td>
+            <td th:text="${tempPart.price}">1</td>
+            <td th:text="${tempPart.inv}">1</td>
+            <td><a th:href="@{/removepart(partID=${tempPart.id})}" class="btn btn-primary btn-sm mb-3">Remove</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
