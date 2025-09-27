@@ -31,3 +31,29 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Ignore Terraform state files and sensitive files
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+
+# Ignore Terraform variable files with secrets
+*.tfvars
+terraform.tfvars
+
+# Ignore override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore local environment files
+.terraformrc
+terraform.rc
+
+# ignore application properties files
+**/application.properties
+
+# Ignore sensitive configuration
+src/main/resources/application.properties

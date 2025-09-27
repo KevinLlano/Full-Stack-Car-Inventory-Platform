@@ -23,12 +23,12 @@ import java.util.List;
 public class AddPartController {
 
     @Autowired
-    private ApplicationContext context;  // Spring Context for bean retrieval
+    private ApplicationContext context;
 
     // Show update form for a Part
     @GetMapping("/showPartFormForUpdate")
     public String showPartFormForUpdate(@RequestParam("partID") int theId, Model theModel) {
-        // Inheritance & Polymorphism: Use PartService to work with different Part subtypes (InhousePart, OutsourcedPart)
+
         PartService repo = context.getBean(PartServiceImpl.class);
         OutsourcedPartService outsourcedrepo = context.getBean(OutsourcedPartServiceImpl.class);
         InhousePartService inhouserepo = context.getBean(InhousePartServiceImpl.class);

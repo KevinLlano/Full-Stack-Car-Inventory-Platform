@@ -7,9 +7,10 @@
 <body style="font-family: Arial; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh;">
 
 <div style="text-align: center;">
-    <a href="http://localhost:8080/" style="text-decoration: none; color: blue; display: block; margin-bottom: 20px;">
-        Back to Main Screen
+    <a href="/" style="color: blue; text-decoration: underline; display: block; margin-bottom: 20px;">
+        &larr; Return to Main Screen
     </a>
+
 
     <h1 style="color: #333;">Inhouse Part Detail</h1>
     <form action="#" th:action="@{/showFormAddInPart}" th:object="${inhousepart}" method="POST">

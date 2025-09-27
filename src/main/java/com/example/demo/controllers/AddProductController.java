@@ -98,7 +98,7 @@ public class AddProductController {
         }
     }
 
-    // Show form to update a product
+    // Shows form to update a product
     @GetMapping("/showProductFormForUpdate")
     public String showProductFormForUpdate(@RequestParam("productID") int theId, Model theModel) {
         theModel.addAttribute("parts", partService.findAll());  // Encapsulation: access parts list

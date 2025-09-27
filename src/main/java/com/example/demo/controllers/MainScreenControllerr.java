@@ -15,34 +15,24 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- *
- *
- *
- *
- */
-
 @Controller
 public class MainScreenControllerr {
-   // private final PartRepository partRepository;
-   // private final ProductRepository productRepository;'
 
-    private PartService partService;
-    private ProductService productService;
+    private final PartService partService;
+    private final ProductService productService;
 
-    private List<Part> theParts;
-    private List<Product> theProducts;
-
- /*   public MainScreenControllerr(PartRepository partRepository, ProductRepository productRepository) {
-        this.partRepository = partRepository;
-        this.productRepository = productRepository;
-    }*/
-
-    public MainScreenControllerr(PartService partService,ProductService productService){
-        this.partService=partService;
-        this.productService=productService;
+    public MainScreenControllerr(PartService partService, ProductService productService) {
+        this.partService = partService;
+        this.productService = productService;
     }
 
+    // Redirect root path to /mainscreen
+    @GetMapping("/")
+    public String redirectToMainScreen() {
+        return "redirect:/mainscreen";
+    }
+
+    // Download CSV report
     @GetMapping("/report")
     public void downloadCSV(HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
@@ -60,18 +50,17 @@ public class MainScreenControllerr {
         writer.close();
     }
 
-
-
+    // Show main screen with parts and products
     @GetMapping("/mainscreen")
-    public String listPartsandProducts(Model theModel, @Param("partkeyword") String partkeyword, @Param("productkeyword") String productkeyword){
-        //add to the sprig model
-        List<Part> partList=partService.listAll(partkeyword);
-        theModel.addAttribute("parts",partList);
-        theModel.addAttribute("partkeyword",partkeyword);
-    //    theModel.addAttribute("products",productService.findAll());
-        List<Product> productList=productService.listAll(productkeyword);
+    public String listPartsandProducts(Model theModel, @Param("partkeyword") String partkeyword, @Param("productkeyword") String productkeyword) {
+        List<Part> partList = partService.listAll(partkeyword);
+        List<Product> productList = productService.listAll(productkeyword);
+
+        theModel.addAttribute("parts", partList);
+        theModel.addAttribute("partkeyword", partkeyword);
         theModel.addAttribute("products", productList);
-        theModel.addAttribute("productkeyword",productkeyword);
+        theModel.addAttribute("productkeyword", productkeyword);
+
         return "mainscreen";
     }
 }

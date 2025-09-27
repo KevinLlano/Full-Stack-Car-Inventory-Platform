@@ -28,20 +28,17 @@ public class Product implements Serializable {
     String name;  // Product name
 
     @Min(value = 0, message = "Price value must be positive")
-    double price;  // Product price, must be positive
+    double price;
 
     @Min(value = 0, message = "Inventory value must be positive")
-    int inv;  // Inventory count, must be positive
+    int inv;
 
     // Many-to-many relation with Parts (a product has many parts)
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "products")
     Set<Part> parts = new HashSet<>();
 
+
     // Getters and setters for encapsulation
-
-    // equals and hashCode overridden for entity identity by id
-
-    // toString returns product name for readability
 
     public Product() {
     }

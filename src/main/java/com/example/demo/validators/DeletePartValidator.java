@@ -5,12 +5,7 @@ import com.example.demo.entity.Part;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-/**
- *
- *
- *
- *
- */
+
 public class DeletePartValidator implements ConstraintValidator<ValidDeletePart, Part> {
     @Override
     public void initialize(ValidDeletePart constraintAnnotation) {

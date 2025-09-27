@@ -8,12 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-/**
- *
- *
- *
- *
- */
+
 
 // This service layer enables separation of concerns, making the application scalable and maintainable.
 @Service
@@ -42,7 +37,7 @@ public class ProductServiceImpl implements ProductService{
             theProduct = result.get();
         }
         else {
-            // we didn't find the product id
+
             throw new RuntimeException("Did not find part id - " + theId);
         }
 

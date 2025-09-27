@@ -7,7 +7,8 @@ http://my-ebs-env.eba-pwmcdgmn.us-east-1.elasticbeanstalk.com/mainscreen   *NO L
 
 This project demonstrates inventory management by filtering for engine parts and car products. It includes indexing as well as search functionality for either parts or products. CRUD is used in the project to create, update, and delete engine parts and car products. The theme of the project focuses on car products which will be car models in this case, with engine parts corresponding to each product.
 
-![Link To UML](https://github.com/user-attachments/assets/50b86a4a-6927-4f58-a51c-b5f9ce00231c)
+**LIVE DEMO:** https://carsupplyshop.netlify.app/ 
+<img width="1895" height="942" alt="AWSinventory" src="https://github.com/user-attachments/assets/63d9f541-a519-4efb-9455-64cf77a10e31" />
 
 ## Features
 
@@ -42,7 +43,9 @@ This project demonstrates inventory management by filtering for engine parts and
 - Mockito
 - Lombok
 - Maven
-```
+
+
+
 
 
 
@@ -55,7 +58,10 @@ The system models a **many-to-many** relationship between Products and Parts usi
 * **Parts** = either **InhousePart** (includes part ID) or **OutsourcedPart** (includes company name)
 * Uses **single-table inheritance** for part types
 
-![UML DIAGRAPHM PIC](https://github.com/user-attachments/assets/7171c3c3-ad40-4faa-bef1-03ab7ff010c1)
+
+![UML Image](https://github.com/user-attachments/assets/689e8e99-9e70-4cdb-8b33-59239d7edaa2)
+
+
 ---
 
 
@@ -162,7 +168,28 @@ assertEquals("mainscreen", result);
 
 ---
 
+# Authentication & Authorization
 
+This project uses Keycloak for authentication and authorization to secure backend endpoints.
+
+**Setup Overview:**
+- Keycloak was deployed via Docker and configured with a dedicated realm and client for the backend.
+- Spring Boot was integrated with Keycloak using the `keycloak-spring-boot-starter` and `spring-boot-starter-oauth2-resource-server` dependencies.
+- Backend endpoints are protected using JWT tokens issued by Keycloak. Only authenticated users can access protected resources.
+- Users and clients are managed in Keycloak; tokens are obtained via the OpenID Connect password grant and used as Bearer tokens in API requests.
+- Example endpoint `/api/secure` demonstrates how authentication is enforced and can be tested using Postman with a valid access token.
+
+**Key Steps:**
+1. Start Keycloak and create a realm and client for the backend.
+2. Configure Spring Boot with Keycloak settings in `application.properties`.
+3. Protect endpoints using Spring Security and JWT validation.
+4. Obtain a token from Keycloak and use it to access secured endpoints.
+
+![img_4.png](img_4.png)
+![img_6.png](img_6.png)
+![img_7.png](img_7.png)
+
+---
 
 
 # Developer Installation Guide
@@ -267,6 +294,7 @@ URL: [https://car-parts-inventory-app.elasticbeanstalk.com](https://car-parts-in
 ---
 # Screenshots
 # Old + New Screenshots including AWS deployment with RDS, S3, EC2, and EBS. provisioned by Terraform
+![](https://github.com/user-attachments/assets/50b86a4a-6927-4f58-a51c-b5f9ce00231c)
 ![img_2.png](img_2.png)
 ![img_1.png](img_1.png)
 ![img.png](img.png)

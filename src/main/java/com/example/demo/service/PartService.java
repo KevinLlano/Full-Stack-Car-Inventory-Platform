@@ -4,12 +4,7 @@ import com.example.demo.entity.Part;
 
 import java.util.List;
 
-/**
- *
- *
- *
- *
- */
+
 public interface PartService {
     public List<Part> findAll();
     public Part findById(int theId);

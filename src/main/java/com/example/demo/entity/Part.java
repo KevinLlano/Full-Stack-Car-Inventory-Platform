@@ -29,10 +29,10 @@ public abstract class Part implements Serializable {
     String name;  // Part name
 
     @Min(value = 0, message = "Price value must be positive")
-    double price;  // Part price, must be positive
+    double price;
 
     @Min(value = 0, message = "Inventory value must be positive")
-    int inv;  // Inventory count, must be positive
+    int inv;
 
     // Many-to-many relation with Product (a part can belong to many products)
     @ManyToMany
