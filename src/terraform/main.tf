@@ -33,7 +33,7 @@ resource "aws_db_instance" "backend_db" {
   engine                 = "postgres"
   instance_class         = "db.t4g.micro"
   username               = "postgres"
-  password               = "1ktl2710zlA"
+  password               = ""
   allocated_storage      = 20
   skip_final_snapshot    = true
   publicly_accessible    = true
@@ -48,7 +48,7 @@ resource "aws_s3_bucket" "ebs_app_bucket" {
 resource "aws_s3_object" "app_zip" {
   bucket = aws_s3_bucket.ebs_app_bucket.bucket
   key    = "app-${var.app_version}.zip"
-  source = "C:/WGUCapstone/app-v8.zip"
+  source = ""
 }
 
 // IAM Role & Instance Profile for Elastic Beanstalk EC2
@@ -83,7 +83,7 @@ resource "aws_elastic_beanstalk_application" "app" {
 
 resource "aws_elastic_beanstalk_application_version" "app_version" {
   application = aws_elastic_beanstalk_application.app.name
-  name        = var.app_version  # Updated reference to use the latest version
+  name        = var.app_version  
   bucket      = aws_s3_bucket.ebs_app_bucket.bucket
   key         = aws_s3_object.app_zip.key
 }
@@ -140,7 +140,7 @@ resource "aws_elastic_beanstalk_environment" "env" {
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "SPRING_DATASOURCE_PASSWORD"
-    value     = "1ktl2710zlA"
+    value     = ""
   }
 
   setting {
