@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Pre-build phase starting...
+      - echo Checking Java and Maven versions
+      - java -version
+      - mvn -version
+
+  build:
+    commands:
+      - echo Build phase starting on `date`
+      - mvn clean package -DskipTests
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Packaging application...
+
+artifacts:
+  files:
+    - target/demo-0.0.1-SNAPSHOT.jar
+    - Procfile
+  discard-paths: no
+
+cache:
+  paths:
+    - '/root/.m2/**/*'
+

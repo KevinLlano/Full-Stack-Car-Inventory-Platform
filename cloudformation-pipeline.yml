@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CI/CD Pipeline Stack - CodePipeline and CodeBuild for Java Spring Boot App'
+
+Parameters:
+  InfrastructureStackName:
+    Type: String
+    Default: 'inventory-infrastructure'
+    Description: Name of the infrastructure stack to import resources from
+
+  GitHubOwner:
+    Type: String
+    Description: GitHub repository owner/organization name
+    Default: 'KevinLlano'
+
+  GitHubRepo:
+    Type: String
+    Description: GitHub repository name
+    Default: 'AWS-Inventory-Management-System'
+
+  GitHubBranch:
+    Type: String
+    Description: GitHub branch to track
+    Default: 'main'
+
+  GitHubConnectionArn:
+    Type: String
+    Description: ARN of the GitHub CodeStar Connection (must be created manually in AWS Console first)
+    NoEcho: true
+
+Resources:
+  # CodeBuild Project
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub '${AWS::StackName}-build'
+      Description: Build project for Java Spring Boot inventory system
+      ServiceRole:
+        Fn::ImportValue: !Sub '${InfrastructureStackName}-CodeBuildRoleArn'
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL  # Cheapest option
+        Image: aws/codebuild/standard:5.0   # Includes Java 17 and Maven
+        EnvironmentVariables:
+          - Name: ARTIFACT_BUCKET
+            Value:
+              Fn::ImportValue: !Sub '${InfrastructureStackName}-ArtifactBucket'
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: buildspec.yml
+      Cache:
+        Type: S3
+        Location:
+          Fn::Sub:
+            - '${Bucket}/build-cache'
+            - Bucket:
+                Fn::ImportValue: !Sub '${InfrastructureStackName}-ArtifactBucket'
+      TimeoutInMinutes: 15
+
+  # CodePipeline
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub '${AWS::StackName}-pipeline'
+      RoleArn:
+        Fn::ImportValue: !Sub '${InfrastructureStackName}-CodePipelineRoleArn'
+      ArtifactStore:
+        Type: S3
+        Location:
+          Fn::ImportValue: !Sub '${InfrastructureStackName}-ArtifactBucket'
+      Stages:
+        # Source Stage - GitHub
+        - Name: Source
+          Actions:
+            - Name: SourceAction
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: '1'
+              Configuration:
+                ConnectionArn: !Ref GitHubConnectionArn
+                FullRepositoryId: !Sub '${GitHubOwner}/${GitHubRepo}'
+                BranchName: !Ref GitHubBranch
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceOutput
+
+        # Build Stage
+        - Name: Build
+          Actions:
+            - Name: BuildAction
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOutput
+
+Outputs:
+  PipelineName:
+    Description: Name of the CodePipeline
+    Value: !Ref Pipeline
+
+  PipelineUrl:
+    Description: URL to the CodePipeline console
+    Value: !Sub 'https://console.aws.amazon.com/codesuite/codepipeline/pipelines/${Pipeline}/view'
+
+  CodeBuildProjectName:
+    Description: Name of the CodeBuild project
+    Value: !Ref CodeBuildProject
+
+  CodeBuildUrl:
+    Description: URL to the CodeBuild console
+    Value: !Sub 'https://console.aws.amazon.com/codesuite/codebuild/projects/${CodeBuildProject}'
+
