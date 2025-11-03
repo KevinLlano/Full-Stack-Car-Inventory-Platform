@@ -11,12 +11,14 @@ phases:
   build:
     commands:
       - echo Build phase starting on `date`
-      - mvn clean package -DskipTests
+      - echo Building with Maven...
+      - mvn clean package -DskipTests -X 2>&1 | tail -200
 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Packaging application...
+      - ls -la target/ || echo "Target directory not found"
 
 artifacts:
   files:
