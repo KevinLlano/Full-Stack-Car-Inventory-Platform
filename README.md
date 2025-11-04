@@ -27,16 +27,24 @@ This project demonstrates inventory management by filtering for engine parts and
 * **Database**: H2 (Development), PostgreSQL (Production)
 * **Hosting**: AWS EC2, AWS Elastic Beanstalk
 * **Version Control**: Git & GitHub
-* **Infrastructure as Code**: Terraform
+* **Infrastructure as Code**: AWS CloudFormation (YAML), Terraform (Legacy)
+* **CI/CD Pipeline**: AWS CodePipeline, AWS CodeBuild, Amazon S3
 
 **Libraries & Tools**:
-- Terraform
+- AWS CloudFormation (Infrastructure as Code)
+- AWS CodePipeline (CI/CD Orchestration)
+- AWS CodeBuild (Automated Builds)
+- Amazon S3 (Artifact Storage & Caching)
+- Terraform (Legacy EBS Deployment)
 - Spring Boot Starter Web
 - Spring Boot Starter Data JPA
+- Spring Boot Starter Security
+- Spring Boot Starter OAuth2 Resource Server
+- Keycloak (Authentication & Authorization)
 - Thymeleaf
 - Spring Boot Starter Validation
 - Spring Boot DevTools
-- H2 Database
+- H2 Database (Legacy)
 - PostgreSQL
 - Spring Boot Starter Test
 - JUnit
@@ -286,6 +294,133 @@ URL: [https://car-parts-inventory-app.elasticbeanstalk.com](https://car-parts-in
 
 ![image](https://github.com/user-attachments/assets/a236342d-1d56-4cfb-8da6-256a59b473de)
 
+## AWS CI/CD Pipeline: CloudFormation + CodeBuild + Codepipeline
+![img_12.png](img_12.png)
+
+**This project demonstrates enterprise-grade DevOps practices by implementing a fully automated **CI/CD pipeline** using AWS CloudFormation, CodePipeline, and CodeBuild.**
+
+![img_8.png](img_8.png)
+![img_9.png](img_9.png)
+![img_11.png](img_11.png)
+#### Architecture Overview
+
+```
+GitHub Repository (main branch)
+         ↓
+CodePipeline (Automated Trigger)
+         ↓
+CodeBuild (Java 17 Maven Build)
+         ↓
+S3 Artifact Repository
+         ↓
+Deployment Ready (JAR + Dependencies)
+```
+
+#### Key Components
+
+**1. CI/CD Orchestration (AWS CodePipeline)**
+- **Fully Managed Pipeline Service**: Automates the entire CI/CD workflow from source to artifact
+- **Multi-Stage Orchestration**: Coordinates execution of Source → Build stages with automatic triggering
+- **GitHub Integration**: Uses CodeStar Connections for secure GitHub webhook-based triggers (no personal access tokens)
+- **Workflow**: 
+  - Detects code changes on main branch
+  - Automatically pulls latest code from GitHub
+  - Triggers CodeBuild for compilation and packaging
+  - Stores build artifacts in S3
+- **Status Monitoring**: Provides real-time pipeline execution status and build logs
+
+**2. Infrastructure as Code (CloudFormation)**
+- Two separate CloudFormation templates for clean separation of concerns:
+  - `cloudformation-infrastructure.yml` – Provisions core AWS resources (S3, IAM roles, CodeBuild project)
+  - `cloudformation-pipeline.yml` – Configures the CI/CD pipeline (CodePipeline stages and GitHub integration)
+- **Benefit**: Infrastructure is version-controlled, reproducible, and auditable
+- **Cost Optimization**: Uses cheapest compute tier (BUILD_GENERAL1_SMALL)
+
+**3. Continuous Integration (CodeBuild)**
+- **Automated Builds**: Every push to the main branch triggers an automatic build
+- **Build Specification** (`buildspec.yml`):
+  - Compiles Java 17 Spring Boot application using Maven
+  - Runs minimal automated tests 
+  - Packages application as a production-ready JAR file
+  - Implements S3 caching for Maven dependencies to reduce build times
+- **Build Artifacts**: JAR files stored in S3 for secure storage and easy retrieval
+
+**4. Artifact Management (Amazon S3)**
+- **Artifact Storage**: CloudPipeline automatically stores build outputs in S3
+- **Caching**: Maven dependency cache stored in S3 to speed up subsequent builds
+- **Versioning**: Build artifacts are timestamped and easily retrievable
+- **Cost-Effective**: S3 lifecycle policies manage old artifacts automatically
+
+**5. GitHub Integration (CodeStar Connections)**
+- Secure OAuth2-based authentication to GitHub
+- No hardcoded credentials or personal access tokens in code
+- Automatic source code polling and change detection
+
+#### Performance & Cost Metrics
+
+| Metric | Value |
+|--------|-------|
+| Build Time | ~2 minutes per execution |
+| Build Compute | BUILD_GENERAL1_SMALL (cheapest option) |
+| Monthly CodePipeline Cost | ~$2-3 (first execution free, $1 per execution after) |
+| Monthly CodeBuild Cost | ~$0.15 (5 min builds × 30 executions = ~150 min) |
+| Artifact Storage | S3 with lifecycle policies |
+| **Total Monthly Cost** | **~$2-5** |
+
+#### Deployment Process
+
+```bash
+# Deploy infrastructure stack
+aws cloudformation create-stack \
+  --stack-name inventory-infrastructure \
+  --template-body file://cloudformation-infrastructure.yml \
+  --capabilities CAPABILITY_IAM
+
+# Deploy pipeline stack
+aws cloudformation create-stack \
+  --stack-name inventory-pipeline \
+  --template-body file://cloudformation-pipeline.yml \
+  --parameters ParameterKey=GitHubConnectionArn,ParameterValue=<your-connection-arn>
+```
+
+#### What This Demonstrates
+
+✅ **DevOps Best Practices**
+- Infrastructure as Code (IaC) using CloudFormation
+- Automated build and deployment pipeline
+- Environment consistency and reproducibility
+
+✅ **CI/CD Maturity**
+- Hands-off deployment (no manual build steps)
+- Artifact versioning and storage
+- Build caching for performance optimization
+
+✅ **Cloud Architecture Knowledge**
+- Multi-stage pipeline orchestration
+- IAM role-based security and least privilege access
+- Cost-conscious resource allocation
+
+✅ **Integration & Automation**
+- GitHub webhook-based CI/CD triggering
+- Secure credential management (OAuth2, not API tokens)
+- Automated artifact management
+
+#### Technology Stack
+
+- **Infrastructure**: AWS CloudFormation (YAML)
+- **CI/CD Orchestration**: AWS CodePipeline
+- **Build System**: AWS CodeBuild + Maven
+- **Source Control**: GitHub with CodeStar Connections
+- **Artifact Storage**: Amazon S3
+- **Logging**: Amazon CloudWatch
+
+#### Security Features
+
+- IAM roles with least privilege permissions
+- No secrets in version control
+- OAuth2-based GitHub authentication
+- S3 encryption for artifacts
+- CloudWatch logging for audit trails
 
 ---
 
