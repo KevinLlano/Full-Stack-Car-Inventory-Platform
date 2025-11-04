@@ -12,19 +12,22 @@ phases:
     commands:
       - echo Build phase starting on `date`
       - echo Building with Maven...
-      - mvn clean package -DskipTests -X 2>&1 | tail -200
+      - mvn clean package -DskipTests
 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Packaging application...
-      - ls -la target/ || echo "Target directory not found"
+      - echo "Contents of target directory:"
+      - ls -la target/
+      - echo "JAR files found:"
+      - find target -name "*.jar" -type f
 
 artifacts:
   files:
-    - target/demo-0.0.1-SNAPSHOT.jar
-    - Procfile
-  discard-paths: no
+    - target/*.jar
+  name: BuildArtifact
+  discard-paths: yes
 
 cache:
   paths:
