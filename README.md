@@ -1,4 +1,4 @@
-# AWS FullStack Inventory Management System
+# AWS FullStack Car Inventory Platform
 
 ### LIVE DEMO:
 **https://carsupplyshop.netlify.app/**
