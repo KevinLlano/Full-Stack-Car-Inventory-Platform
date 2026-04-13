@@ -2,8 +2,8 @@ package com.example.demo.validators;
 
 import com.example.demo.entity.Part;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 
 public class DeletePartValidator implements ConstraintValidator<ValidDeletePart, Part> {
