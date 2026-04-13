@@ -1,4 +1,4 @@
-# AWS FullStack Inventory Management System
+# (fullstack) Secure AI Car Inventory Management Platform
 
 ### LIVE DEMO:
 **https://carsupplyshop.netlify.app/**
