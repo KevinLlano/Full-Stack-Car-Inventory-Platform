@@ -5,7 +5,7 @@ services:
     image: ankane/pgvector:v0.5.1 # Official pgvector Docker image
     container_name: local-ai-pgvector
     env_file:
-      - src/.env
+      - .env
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
