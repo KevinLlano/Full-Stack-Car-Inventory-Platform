@@ -58,3 +58,6 @@ terraform.rc
 # Ignore sensitive configuration
 src/main/resources/application.properties
 bash.exe.stackdump
+
+# Ignore environment variable files
+src/.env
