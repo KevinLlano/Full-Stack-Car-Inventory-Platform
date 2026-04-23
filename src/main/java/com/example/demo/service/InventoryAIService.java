@@ -25,13 +25,16 @@ public class InventoryAIService {
     }
 
     public String askQuestion(String question) {
-        // 1. Retrieve relevant data from pgvector database
+        // 1. Retrieve relevant data from pgvector database using Builder Pattern (Spring AI 1.1.x)
         List<Document> similarDocuments = vectorStore.similaritySearch(
-                SearchRequest.query(question).withTopK(3)
+                SearchRequest.builder()
+                        .query(question)
+                        .topK(3)
+                        .build()
         );
 
         String context = similarDocuments.stream()
-                .map(Document::getContent)
+                .map(Document::getText)
                 .collect(Collectors.joining("\n"));
 
         // 2. Build a prompt injecting the local database context
@@ -54,6 +57,6 @@ public class InventoryAIService {
         ));
 
         // 3. Send to AWS Bedrock LLM and return the response
-        return chatModel.call(prompt).getResult().getOutput().getContent();
+        return chatModel.call(prompt).getResult().getOutput().getText();
     }
 }

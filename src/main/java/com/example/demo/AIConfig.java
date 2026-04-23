@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AIConfig {
-    // Spring AI auto-configures ChatModel using AWS credentials from ~/.aws/credentials
-    // No manual bean definition needed when using aws configure
+    // Spring AI Bedrock auto-configuration handles ChatModel bean creation.
+    // No manual bean configuration needed—just ensure application.properties
+    // has the required properties set.
 }
