@@ -12,12 +12,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            // Disable CSRF for local testing
+            .csrf(csrf -> csrf.disable())
+            // Permit all requests for now to test Bedrock
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/public/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(org.springframework.security.config.Customizer.withDefaults())
+                .anyRequest().permitAll()
             );
         return http.build();
     }

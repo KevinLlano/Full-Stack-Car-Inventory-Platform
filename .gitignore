@@ -60,4 +60,5 @@ src/main/resources/application.properties
 bash.exe.stackdump
 
 # Ignore environment variable files
+.env
 src/.env
