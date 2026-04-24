@@ -23,18 +23,24 @@ This project demonstrates inventory management by filtering for engine parts and
 * **User-Friendly Interface** - Includes buttons for adding in-house or outsourced parts, as well as update and delete actions for each item.
 * **Downloadable CSV Report** - Export current inventory into a CSV file for audits or records.
 * **UI Part/Model Association** - Assign multiple parts to products with a clean visual interface.
+* **AI-Powered Inventory Chat** - Natural language queries powered by AWS Bedrock Llama 3.1 with RAG (Retrieval-Augmented Generation) for intelligent inventory insights.
 
 ---
 
 ## 🛠️ Technologies Used
 
-* **Backend**: Spring Boot
+* **Backend**: Spring Boot 3.5.13
 * **Frontend**: React – [Frontend Repo](https://github.com/KevinLlano/React-Frameworks2.0.git)
 * **Database**: H2 (Development), PostgreSQL (Production)
+* **Vector Database**: PostgreSQL pgvector (Docker)
+* **AI/LLM**: Spring AI 1.1.4, AWS Bedrock (Llama 3.1, Titan V2 Embeddings)
 * **Hosting**: AWS EC2, AWS Elastic Beanstalk
+* **Containerization**: Docker, Docker Compose
 * **Version Control**: Git & GitHub
 * **Infrastructure as Code**: AWS CloudFormation (YAML), Terraform (Legacy)
 * **CI/CD Pipeline**: AWS CodePipeline, AWS CodeBuild, Amazon S3
+* **Authentication**: AWS SSO, Keycloak, OAuth2 Resource Server
+* **API Testing**: Postman
 
 **Libraries & Tools**:
 - AWS CloudFormation (Infrastructure as Code)
@@ -46,14 +52,17 @@ This project demonstrates inventory management by filtering for engine parts and
 - Spring Boot Starter Data JPA
 - Spring Boot Starter Security
 - Spring Boot Starter OAuth2 Resource Server
-- Keycloak (Authentication & Authorization)
+- Spring AI (Bedrock, pgvector)
+- AWS SDK v2 (Bedrock Runtime)
+- PostgreSQL Driver
+- pgvector Extension
+- Keycloak Spring Boot Starter
 - Thymeleaf
 - Spring Boot Starter Validation
 - Spring Boot DevTools
 - H2 Database
-- PostgreSQL
 - Spring Boot Starter Test
-- JUnit
+- JUnit 5
 - Mockito
 - Lombok
 - Maven
@@ -77,8 +86,11 @@ The system models a **many-to-many** relationship between Products and Parts usi
 ### 📦 Prerequisites
 
 * **JDK 17+**
-* **Maven**
+* **Maven 3.8+**
 * **Node.js & npm**
+* **Docker & Docker Compose**
+* **AWS CLI**
+* **Postman** (for API testing)
 
 ---
 
@@ -189,11 +201,13 @@ This project uses Keycloak for authentication and authorization to secure backen
 
 ### System Requirements
 
-* Java 17
+* Java 17+
 * Maven 3.8+
-* PostgreSQL 13+
+* PostgreSQL 13+ (or Docker)
+* Docker & Docker Compose
 * AWS CLI
 * Git
+* AWS Account with Bedrock access
 
 ### Setup
 
@@ -202,15 +216,23 @@ git clone https://github.com/KevinLlano/AWS-Inventory-Management-System.git
 cd aws-inventory-system
 ```
 
-* Create DB:
+* Start PostgreSQL with pgvector via Docker:
 
-```sql
-CREATE DATABASE car_parts_inventory;
+```bash
+docker-compose up -d
 ```
 
-* Update `application.properties`:
+* Configure AWS credentials:
+
+```bash
+aws sso login --profile dev
+export AWS_PROFILE=dev
+```
+
+* Update `application.properties` (DB config pre-configured for Docker):
 
 ```properties
+# Already configured for local Docker pgvector
 spring.datasource.url=jdbc:postgresql://localhost:5432/car_parts_inventory
 spring.datasource.username=your_user
 spring.datasource.password=your_password
@@ -222,6 +244,8 @@ spring.datasource.password=your_password
 mvn clean install
 mvn spring-boot:run
 ```
+
+Access at: `http://localhost:8080`
 
 ---
 
@@ -412,9 +436,176 @@ aws cloudformation create-stack \
 
 ---
 
-## 📸 Screenshots
+## 🤖 AI Integration: Inventory Assistant
 
+**AI Chat Examples:**
+
+**Question 1:** Inventory Summary Query
+<img src="pictures/aichat1.png" width="520" height="400" alt="AI Chat Question 1">
+
+**Question 2:** Product-Part Association Query
+<img src="pictures/aichatquestion2.png" width="520" height="400" alt="AI Chat Question 2">
+
+**Question 3:** Cost Analysis Query
+<img src="pictures/aichatquestion3.png" width="520" height="400" alt="AI Chat Question 3">
+
+### Overview
+
+This project features an intelligent AI-powered inventory chat built on **Spring AI 1.1.4** and **AWS Bedrock**, enabling natural language queries against your inventory database. The implementation follows enterprise best practices for cost efficiency, security, and scalability.
+
+### Architecture
+
+```
+User Question (API)
+    ↓
+InventoryAIService (RAG Pattern)
+    ├─ Vector Similarity Search (pgvector) → Retrieves top 3 relevant documents
+    ├─ Context Injection (Prompt Template) → Builds rich prompt with inventory data
+    └─ LLM Generation (AWS Bedrock Llama 3.1) → Returns contextualized response
+```
+
+### Key Features
+
+* **Retrieval-Augmented Generation (RAG)**: Queries enhanced with real inventory data, preventing hallucinations
+* **Local-First Infrastructure**: PostgreSQL pgvector runs via Docker (no cloud DB costs)
+* **AWS SSO Authentication**: Enterprise credential management via AWS CLI profiles (no hardcoded secrets)
+* **Cost-Optimized**: ~$1/month (Bedrock only); local infrastructure = FREE
+
+### Technologies & Tools
+
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| Backend Framework | Spring Boot 3.5.13 | REST API & auto-config |
+| AI Framework | Spring AI 1.1.4 (GA) | Unified AI abstraction |
+| LLM | AWS Bedrock Llama 3.1 8B | Natural language understanding |
+| Embeddings | AWS Bedrock Titan V2 | Vector representations (1024-dim) |
+| Vector DB | PostgreSQL pgvector (Docker) | Semantic search & storage |
+| Auth | AWS SSO + DefaultCredentialsProvider | Enterprise credential management |
+| Containerization | Docker Compose 3.8 | Local development |
+
+### Enterprise Best Practices
+
+#### 1. **Security: AWS SSO (No Hardcoded Keys)**
+- ✅ AWS SDK's `DefaultCredentialsProvider` auto-discovers SSO tokens
+- ✅ No API keys in `.env` or codebase
+- ✅ AWS profile-based authentication
+```bash
+aws sso login --profile dev
+export AWS_PROFILE=dev && mvn spring-boot:run
+```
+
+#### 2. **Cost Optimization: "Local First" Pattern**
+- ✅ PostgreSQL + pgvector in Docker (FREE)
+- ✅ Only pay for Bedrock API calls (~$0.001 per query)
+- **Monthly Cost**: Bedrock LLM (~$0.50) + Embeddings (~$0.10) = **~$1/month**
+
+#### 3. **Version Stability: Milestone → GA**
+- ✅ Upgraded Spring AI 1.0.0-M1 → 1.1.4 (fixed base64 bugs)
+- ✅ Migrated to Bedrock Converse API (unified interface)
+- ✅ Updated Spring AI 1.1.x APIs (Builder Pattern, `getText()` method)
+
+#### 4. **Configuration Management**
+- ✅ Separated config from code (`application.properties`)
+- ✅ Environment variables for sensitive data (`AWS_PROFILE`, `DB_*`)
+- ✅ Spring Boot auto-configuration manages beans
+
+### Challenges Overcome
+
+| Challenge | Solution |
+|-----------|----------|
+| Base64 image validation errors | Upgraded Spring AI 1.0.0-M1 → 1.1.4; removed multimodal bugs |
+| ChatModel bean not found | Added `spring.ai.model.chat=bedrock-converse` property selector |
+| Vector dimension mismatch (1536 vs 1024) | Updated pgvector to match Titan V2 standard 1024 dimensions |
+| Invalid AWS credentials (403) | Implemented AWS SSO with DefaultCredentialsProvider chain |
+| Spring AI 1.1.x API changes | Migrated `SearchRequest.query()` → `builder()`, `getContent()` → `getText()` |
+
+### Testing the AI Endpoint
+
+```bash
+# Endpoint: POST http://localhost:8080/api/ai/chat
+
+# Example Queries:
+{
+  "question": "Give me a summary of the current inventory including total products and parts"
+}
+
+{
+  "question": "Which products have the most parts associated with them?"
+}
+
+{
+  "question": "What is the cheapest part and most expensive product?"
+}
+```
+
+### Local Development (Docker + Bedrock)
+
+```bash
+# 1. Start PostgreSQL with pgvector
+docker-compose up -d
+
+# 2. Authenticate with AWS SSO
+aws sso login --profile dev
+aws sts get-caller-identity --profile dev
+
+# 3. Build and run
+mvn clean install
+export AWS_PROFILE=dev
+mvn spring-boot:run
+
+# 4. Test in Postman
+POST http://localhost:8080/api/ai/chat
+```
+
+### Production Deployment (Docker → AWS ECR via SSO)
+
+```bash
+# 1. Build Docker image
+docker build -t car-inventory-ai .
+
+# 2. Authenticate Docker with ECR (using AWS SSO profile)
+aws ecr get-login-password --region us-east-1 --profile dev | \
+  docker login --username AWS --password-stdin <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com
+
+# 3. Tag and push to ECR
+docker tag car-inventory-ai:latest <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/car-inventory-ai:latest
+docker push <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/car-inventory-ai:latest
+
+# 4. Deploy to ECS/EKS (IAM role handles auth, no credentials in container)
+```
+
+### Project Structure
+
+```
+src/main/java/com/example/demo/
+├── controllers/InventoryAIController.java    # REST endpoint
+├── service/InventoryAIService.java           # RAG & Bedrock integration
+├── AIConfig.java                              # Spring AI beans
+└── SecurityConfig.java                        # Auth config
+
+docker-compose.yml                             # pgvector setup
+application.properties                         # Spring AI config
+```
+
+---
+
+## 📸 Screenshots
 Old and New Screenshots including AWS deployment with RDS, S3, EC2, and EBS provisioned by Terraform.
+
+![](https://github.com/user-attachments/assets/50b86a4a-6927-4f58-a51c-b5f9ce00231c)
+![img_1.png](img_1.png)
+![img_2.png](img_2.png)
+![img.png](img.png)
+![image](https://github.com/user-attachments/assets/f80195d3-79d1-4f5a-9554-c9f514c9f7d7)
+![S3 Bucket](https://github.com/user-attachments/assets/97a1c567-1873-4097-a3ed-0a5a1108b67c)
+![EC2 Instance](https://github.com/user-attachments/assets/89dcd08b-688c-4635-8b9d-7365488c9784)
+![RDS PostgreDB](https://github.com/user-attachments/assets/39972689-b496-4b3b-a002-f06712f665ae)
+![EBS Deployment](https://github.com/user-attachments/assets/b8d628e1-01a0-4056-8986-d08451fb6394)
+![image](https://github.com/user-attachments/assets/00b4818e-7944-49bb-be82-842f1e2c79bd)
+![image](https://github.com/user-attachments/assets/2a9dc156-8de5-4b4c-bc4c-ba71b0bdd911)
+![image](https://github.com/user-attachments/assets/f2b30d05-d212-4ed5-bc04-d2a3773cac12)
+![image](https://github.com/user-attachments/assets/afb2d82b-06ba-4122-91db-b95c4dbf9d27)
+![image](https://github.com/user-attachments/assets/7fe222b4-7def-4f85-9a32-253017c99754)
 
 ![](https://github.com/user-attachments/assets/50b86a4a-6927-4f58-a51c-b5f9ce00231c)
 ![img_1.png](img_1.png)
